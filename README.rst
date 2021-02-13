@@ -20,13 +20,13 @@ Sample Usage::
 
 Other functions::
 
-    >>> mmh3_unsigned.hash64('foo') # two 64 bit signed ints (by using the 128-bit algorithm as its backend)
+    >>> mmh3_unsigned.hash64('foo', signed=True) # two 64 bit signed ints (by using the 128-bit algorithm as its backend)
     (-2129773440516405919, 9128664383759220103)
-    >>> mmh3_unsigned.hash64('foo',signed =False) #  two 64 bit unsigned ints
+    >>> mmh3_unsigned.hash64('foo') #  two 64 bit unsigned ints
     (16316970633193145697, 9128664383759220103)
     >>> mmh3_unsigned.hash128('foo', 42) # 128 bit unsigned int
     215966891540331383248189432718888555506
-    >>> mmh3_unsigned.hash128('foo', 42, signed = True) # 128 bit signed int
+    >>> mmh3_unsigned.hash128('foo', 42) # 128 bit signed int
     -124315475380607080215185174712879655950
     >>> mmh3_unsigned.hash_bytes('foo') # 128 bit value as bytes
     'aE\xf5\x01W\x86q\xe2\x87}\xba+\xe4\x87\xaf~'
@@ -38,9 +38,9 @@ Other functions::
 
 Version 2.5 added ``hash_from_buffer``, which hashes byte-likes without memory copying. The method is suitable when you hash a large memory-view such as ``numpy.ndarray``.
 
-    >>> mmh3_unsigned.hash_from_buffer(numpy.random.rand(100))
+    >>> mmh3_unsigned.hash_from_buffer(numpy.random.rand(100), signed=True)
     -2137204694
-    >>> mmh3_unsigned.hash_from_buffer(numpy.random.rand(100), signed = False)
+    >>> mmh3_unsigned.hash_from_buffer(numpy.random.rand(100))
     3812874078
 
 Beware that ``hash64`` returns **two** values, because it uses the 128-bit version of MurmurHash3 as its backend.
