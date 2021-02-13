@@ -1,5 +1,5 @@
 ---
-name: mmh3_unsigned
+name: publish mmh3_unsigned
 on:
   push:
     branches:
@@ -7,15 +7,22 @@ on:
 
 jobs:
   publish:
-    name: Push to PyPi
-    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        platform: [ubuntu-latest, macos-latest]
+    runs-on: ${{ matrix.platform }}
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
       - name: Setup Python
         uses: actions/setup-python@v2
+      - name: Install Python dependencies
+        run: pip install -e ".[compat,dev]" cibuildwheel twine
       - name: Publish a Python distribution to PyPI
-        uses: casperdcl/deploy-pypi@v2
-        with:
-          password: ${{ secrets.PYPI_API_TOKEN }}
-          build: true
+        env:
+          PYPI_API_TOKEN: ${{ secrets.PYPI_API_TOKEN }}
+        run: |
+          cibuildwheel --output-dir dist
+          python setup.py sdist
+          ls dist
+          twine upload dist/* -u __token__ -p ${PYPI_API_TOKEN}
