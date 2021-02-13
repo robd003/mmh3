@@ -34,7 +34,7 @@ mmh3_hash(PyObject *self, PyObject *args, PyObject *keywds)
     uint32_t seed = 0;
     int32_t result[1];
     long long_result = 0;
-    int is_signed = 1;
+    int is_signed = 0;
     
     static char *kwlist[] = {(char *)"key", (char *)"seed",
       (char *)"signed", NULL};
@@ -72,7 +72,7 @@ mmh3_hash_from_buffer(PyObject *self, PyObject *args, PyObject *keywds)
     uint32_t seed = 0;
     int32_t result[1];
     long long_result = 0;
-    int is_signed = 1;
+    int is_signed = 0;
 
     static char *kwlist[] = {(char *)"key", (char *)"seed",
       (char *)"signed", NULL};
@@ -111,7 +111,7 @@ mmh3_hash64(PyObject *self, PyObject *args, PyObject *keywds)
     uint32_t seed = 0;
     uint64_t result[2];
     char x64arch = 1;
-    int is_signed = 1;
+    int is_signed = 0;
 
     static char *kwlist[] = {(char *)"key", (char *)"seed",
       (char *)"x64arch", (char *)"signed", NULL};
@@ -199,12 +199,7 @@ struct module_state {
   PyObject *error;
 };
     
-#if PY_MAJOR_VERSION >= 3
 #define GETSTATE(m) ((struct module_state*)PyModule_GetState(m))
-#else
-#define GETSTATE(m) (&_state)
-static struct module_state _state;
-#endif
 
 static PyMethodDef Mmh3Methods[] = {
     {"hash", (PyCFunction)mmh3_hash, METH_VARARGS | METH_KEYWORDS,
@@ -221,7 +216,6 @@ static PyMethodDef Mmh3Methods[] = {
     {NULL, NULL, 0, NULL}
 };
 
-#if PY_MAJOR_VERSION >= 3
 
 static int mmh3_traverse(PyObject *m, visitproc visit, void *arg) {
     Py_VISIT(GETSTATE(m)->error);
@@ -235,7 +229,7 @@ static int mmh3_clear(PyObject *m) {
 
 static struct PyModuleDef mmh3module = {
     PyModuleDef_HEAD_INIT,
-    "mmh3",
+    "mmh3_unsigned",
     "mmh3 is a Python front-end to MurmurHash3, a fast and robust hash library created by Austin Appleby (http://code.google.com/p/smhasher/).\n Ported by Hajime Senuma <hajime.senuma@gmail.com>\n Try hash('foobar') or hash('foobar', 1984).\n If you find any bugs, please submit an issue via https://github.com/hajimes/mmh3",
     sizeof(struct module_state),
     Mmh3Methods,
@@ -249,27 +243,13 @@ static struct PyModuleDef mmh3module = {
 
 extern "C" {
 PyMODINIT_FUNC
-PyInit_mmh3(void)
-
-#else // PY_MAJOR_VERSION >= 3
-#define INITERROR return
-
-extern "C" {
-void
-initmmh3(void)
-#endif // PY_MAJOR_VERSION >= 3
-
-{
-#if PY_MAJOR_VERSION >= 3
+PyInit_mmh3(void) {
     PyObject *module = PyModule_Create(&mmh3module);
-#else
-    PyObject *module = Py_InitModule("mmh3", Mmh3Methods);
-#endif
 
     if (module == NULL)
         INITERROR;
 
-    PyModule_AddStringConstant(module, "__version__", "2.5.1");
+    PyModule_AddStringConstant(module, "__version__", "2.5.3");
 
     struct module_state *st = GETSTATE(module);
 
@@ -279,8 +259,6 @@ initmmh3(void)
         INITERROR;
     }
 
-#if PY_MAJOR_VERSION >= 3
     return module;
-#endif
 }
 } // extern "C"
