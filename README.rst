@@ -1,5 +1,5 @@
 mmh3_unsigned
-====
+=============
 
 Python wrapper for MurmurHash (MurmurHash3), a set of fast and robust hash functions.
 
